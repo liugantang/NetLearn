@@ -8,3 +8,4 @@ project ("NetLearn")
 # 包含子项目。
 add_subdirectory ("NetLearn")
 add_subdirectory ("TimeGet")
+add_subdirectory("Common")
