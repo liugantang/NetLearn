@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include "common.h"
 
 int main()
 {
-	printf("hello client\n");
-	for (;;)
-	{
-		sleep(1);
-		printf("client is running\n");
-	}
+	int sockfd,n;
+    char recvline[MAXLINE+1];
+    struct sockaddr_in servaddr;
+
 	return 0;
 }
