@@ -6,8 +6,8 @@ int main()
 	printf("hello server!\n");
 	for (;;)
 	{
-		sleep(1000);
-		printf("server is running");
+		sleep(1);
+		printf("server is running\n");
 	}
 	return 0;
 }
