@@ -62,6 +62,18 @@ int main(int argc, char * argv[])
             printf("client addr: %s\n", clientaddrstr);
             printf("client port:%d\n", ntohs(clienaddr.sin_port));
 
+			struct sockaddr_in peeraddr;
+			char peername[INET_ADDRSTRLEN];
+			socklen_t peerlen = sizeof peeraddr;
+			if (getpeername(connfd, (SA*)&peeraddr, &peerlen) < 0)
+			{
+				perror("get peer name error");
+				exit(1);
+			}
+			inet_ntop(AF_INET, &peeraddr.sin_addr, peername, INET_ADDRSTRLEN);
+			printf("peer name:%s\n", peername);
+			printf("peer port:%d\n", ntohs(peeraddr.sin_port));
+
             tick = time(NULL);
             snprintf(senddata, MAXLINE, "%.24s\r\n", ctime(&tick));
 
