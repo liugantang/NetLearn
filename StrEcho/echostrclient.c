@@ -13,23 +13,31 @@
 
 void str_cli(FILE * fp, int sockfd)
 {
-	char sendline[MAXLINE];
-	char recvline[MAXLINE];
+	char sendline[SMALLLINE];
+	char recvline[SMALLLINE+1];
 
-	while (fgets(sendline, MAXLINE, fp) != NULL)
+	while (fgets(sendline, SMALLLINE, fp) != NULL)
 	{
-		if (write(sockfd, sendline, strlen(sendline))<0)
+		long wsize = strlen(sendline);
+		if (write(sockfd, &wsize, sizeof wsize)<0)
+		{
+			perror("write error");
+		}
+
+		if (write(sockfd, sendline, wsize)<0)
 		{
 			perror("write error");
 			return;
 		}
 
-		if (read(sockfd, recvline, MAXLINE) < 0)
+		int n = 0;
+		if ((n = read(sockfd, recvline, SMALLLINE)) < 0)
 		{
 			perror("read error");
 			return;
 		}
-		fputs(recvline, stdout);
+
+		write(STDOUT_FILENO, recvline, n);
 	}
 }
 
@@ -53,7 +61,18 @@ int main(int argc, char * argv[])
 
 	if (connect(connfd, (SA*)&servaddr,sizeof servaddr) == 0)
 	{
-		str_cli(stdin, connfd);
+		if (argc == 2)
+		{
+			str_cli(stdin, connfd);
+		}
+		else if (argc == 3)
+		{
+			FILE * fp = fopen(argv[2], "r");
+			if (fp != NULL)
+			{
+				str_cli(fp, connfd);
+			}
+		}
 	}
 
 	close(connfd);

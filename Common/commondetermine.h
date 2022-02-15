@@ -5,6 +5,7 @@
 #ifndef NETLEARN_COMMONDETERMINE_H
 #define NETLEARN_COMMONDETERMINE_H
 #define  MAXLINE 4096
+#define SMALLLINE 16
 #define COMMONPORT 13333
 #define LISTENQ 64
 typedef struct sockaddr SA;

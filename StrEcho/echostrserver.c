@@ -20,17 +20,35 @@ void str_echo(int sockfd)
 
 	for (;;)
 	{
-		char buf[MAXLINE];
-		while ((n = read(sockfd, buf, MAXLINE)) > 0)
+		char buf[SMALLLINE+1];
+		bzero(buf, sizeof buf);
+		long wsize = 0;
+		n = read(sockfd, &wsize, sizeof wsize);
+		if (n != 0 && n != sizeof wsize)
 		{
+			perror("read fail");
+			printf("read fail value:%ld\n", wsize);
+		}
+		while ((n = read(sockfd, buf, wsize)) > 0 && n > 0)
+		{
+			char log[MAXLINE];
+			snprintf(log, MAXLINE,"read data:%s and left size: %ld\n", buf, wsize);
+			fputs(log, stdout);
+			wsize -= n;
+			char wbuf[n+1];
+			strncpy(wbuf, buf, n);
+			printf("cpy buf %s\n", wbuf);
 			for (int i = 0; i < n; i++)
 			{
 				if (buf[i]>='a'&&buf[i]<='z')
 				{
-					buf[i] = toupper(buf[i]);
+					wbuf[i] = toupper(buf[i]);
 				}
 			}
-			write(sockfd, buf, n);
+
+			printf("write str:%s\n", wbuf);
+
+			write(sockfd, wbuf, n);
 		}
 
 		if (n < 0 && errno == EINTR)
