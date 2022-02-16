@@ -19,6 +19,7 @@ void str_cli(FILE * fp, int sockfd)
 	while (fgets(sendline, SMALLLINE, fp) != NULL)
 	{
 		long wsize = strlen(sendline);
+		//write header, describe data size
 		if (write(sockfd, &wsize, sizeof wsize)<0)
 		{
 			perror("write error");
