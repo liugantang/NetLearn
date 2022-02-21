@@ -30,3 +30,4 @@ Sigfunc* signal(int signo, Sigfunc* func)
 
 	return oact.sa_handler;
 }
+

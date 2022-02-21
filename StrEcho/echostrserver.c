@@ -12,8 +12,24 @@
 #include <ctype.h>
 #include <commondetermine.h>
 #include <errno.h>
+#include <sys/wait.h>
 
 extern int errno;
+
+void sig_chld(int signo)
+{
+	pid_t pid;
+	int stat;
+//	Incorrect code, it can not solve the problem that children become zombie process.
+//	pid = wait(stat);
+//	printf("child %d terminate\n", pid);
+
+//Correct code,it can make all children process terminate;
+	while ((pid = waitpid(-1, &stat, WNOHANG))>0)
+	{
+		printf("child %d terminate\n", pid);
+	}
+}
 void str_echo(int sockfd)
 {
 	ssize_t n = 0;
@@ -24,20 +40,27 @@ void str_echo(int sockfd)
 		bzero(buf, sizeof buf);
 		long wsize = 0;
 		n = read(sockfd, &wsize, sizeof wsize);
-		if (n != 0 && n != sizeof wsize)
+		printf("read size %ld\n", n);
+
+		if (n == 0 )
 		{
-			perror("read fail");
-			printf("read fail value:%ld\n", wsize);
+			printf("read finished");
+			break;
 		}
 		while ((n = read(sockfd, buf, wsize)) > 0 && n > 0)
 		{
+			if (n == EOF)
+			{
+				printf("n is EOF\n");
+				break;
+			}
 			char log[MAXLINE];
 			snprintf(log, MAXLINE,"read data:%s and left size: %ld\n", buf, wsize);
 			fputs(log, stdout);
 			wsize -= n;
 			char wbuf[n+1];
 			strncpy(wbuf, buf, n);
-			printf("cpy buf %s\n", wbuf);
+			printf("copy buf %s\n", wbuf);
 			for (int i = 0; i < n; i++)
 			{
 				if (buf[i]>='a'&&buf[i]<='z')
@@ -58,6 +81,10 @@ void str_echo(int sockfd)
 		else if (n < 0)
 		{
 			perror("read error");
+			break;
+		}
+		else if (n == EOF)
+		{
 			break;
 		}
 	}
@@ -87,7 +114,7 @@ int main(int argc, char * argv[])
 	}
 
 	printf("bind success\n");
-
+	signal(SIGCHLD, sig_chld);
 	if (listen(listenfd, LISTENQ) < 0)
 	{
 		perror("listen error\n");
@@ -117,6 +144,7 @@ int main(int argc, char * argv[])
 			str_echo(connfd);
 			close(connfd);
 			close(listenfd);
+			printf("close child process\n");
 			exit(0);
 		}
 	}
