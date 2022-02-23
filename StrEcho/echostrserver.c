@@ -126,6 +126,10 @@ int main(int argc, char * argv[])
 	for (;;)
 	{
 		connfd = accept(listenfd, NULL, 0);
+		if (connfd < 0 && errno == EINTR)
+		{
+			continue;
+		}
 		int sid;
 		if ((sid = fork())>0)
 		{
@@ -141,9 +145,9 @@ int main(int argc, char * argv[])
 			printf("peer addr name: %s\n", peername);
 			printf("peer addr port: %d\n", ntohs(peeraddr.sin_port));
 
+			close(listenfd);
 			str_echo(connfd);
 			close(connfd);
-			close(listenfd);
 			printf("close child process\n");
 			exit(0);
 		}

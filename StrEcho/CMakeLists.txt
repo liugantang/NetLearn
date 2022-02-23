@@ -13,3 +13,9 @@ target_link_libraries(EchoStrClient libcommon.a)
 
 add_executable(EchoStr5Clients "echostr5client.c" strcli.h)
 target_link_libraries(EchoStr5Clients libcommon.a)
+
+add_executable(EchoSumClient "echosumclient.c")
+target_link_libraries(EchoSumClient libcommon.a)
+
+add_executable(EchoSumServer "echosumserver.c")
+target_link_libraries(EchoSumServer libcommon.a)
